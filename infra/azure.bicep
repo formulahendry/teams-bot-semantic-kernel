@@ -18,6 +18,12 @@ param botDisplayName string
 param serverfarmsName string = resourceBaseName
 param webAppName string = resourceBaseName
 param location string = resourceGroup().location
+param m365ClientId string
+param m365TenantId string
+param m365OauthAuthorityHost string
+param m365ApplicationIdUri string = 'api://botid-${botAadAppClientId}'
+@secure()
+param m365ClientSecret string
 
 // Compute resources for your Web App
 resource serverfarm 'Microsoft.Web/serverfarms@2021-02-01' = {
@@ -70,6 +76,20 @@ module azureBotRegistration './botRegistration/azurebot.bicep' = {
     botAadAppClientId: botAadAppClientId
     botAppDomain: webApp.properties.defaultHostName
     botDisplayName: botDisplayName
+  }
+}
+
+resource webAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
+  name: '${webAppName}/appsettings'
+  properties: {
+      TeamsFx__Authentication__ClientId: m365ClientId
+      TeamsFx__Authentication__ClientSecret: m365ClientSecret
+      TeamsFx__Authentication__Bot__InitiateLoginEndpoint: uri('https://${webApp.properties.defaultHostName}', 'bot-auth-start')
+      TeamsFx__Authentication__OAuthAuthority: uri(m365OauthAuthorityHost, m365TenantId)
+      TeamsFx__Authentication__ApplicationIdUri: m365ApplicationIdUri
+      BOT_ID: botAadAppClientId
+      BOT_PASSWORD: botAadAppClientSecret
+      RUNNING_ON_AZURE: '1'
   }
 }
 
