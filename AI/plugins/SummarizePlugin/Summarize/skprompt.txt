@@ -1,0 +1,7 @@
+[INSTRUCTIONS]
+Summarize the following conversation in 2-3 sentences.
+
+[CONVERSATION HISTORY]
+{{$input}}
+
+[SUMMARY]

@@ -1,37 +1,23 @@
+using Azure.Core;
 using Microsoft.Bot.Builder;
 using Microsoft.Graph;
-using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.TeamsFx.Configuration;
+using MyTeamsAppSK_BotSSO.AI;
 
 namespace MyTeamsAppSK_BotSSO.SSO;
-
-public class TokenProvider : IAccessTokenProvider
-{
-  private string token { get; set; }
-
-  public TokenProvider(String token)
-  {
-    this.token = token;
-  }
-
-  public Task<string> GetAuthorizationTokenAsync(Uri uri, Dictionary<string, object> additionalAuthenticationContext = default,
-      CancellationToken cancellationToken = default)
-  {
-    // get the token and return it
-    return Task.FromResult(this.token);
-  }
-
-  public AllowedHostsValidator AllowedHostsValidator { get; }
-}
 
 public static class SsoOperations
 {
     public static async Task ShowUserInfo(ITurnContext stepContext, string token, BotAuthenticationOptions botAuthOptions)
     {
-        await stepContext.SendActivityAsync("Retrieving user information from Microsoft Graph ...");
-        var tokenCredential = new BaseBearerTokenAuthenticationProvider(new TokenProvider(token));
-        var graphClient = new GraphServiceClient(tokenCredential);
-        var profile = await graphClient.Me.GetAsync();
-        await stepContext.SendActivityAsync($"You're logged in as {profile.DisplayName}");
+        await stepContext.SendActivityAsync("Calling Microsoft Graph by Semantic Kernel ...");
+        var authProvider = new DelegateAuthenticationProvider((requestMessage) =>
+        {
+            requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            return Task.CompletedTask;
+        });
+        var graphClient = new GraphServiceClient(authProvider);
+        var result = await SemanticKernel.ProcessRequest(graphClient);
+        await stepContext.SendActivityAsync(result);
     }
 }

@@ -41,7 +41,7 @@ public class SsoDialog : ComponentDialog
             throw new Exception($"Bot authentication config is missing or not correct with error: {e.Message}");
         }
 
-        var settings = new TeamsBotSsoPromptSettings(_botAuthOptions, new string[] { "User.Read" });
+        var settings = new TeamsBotSsoPromptSettings(_botAuthOptions, new string[] { "User.Read", "Files.ReadWrite", "Tasks.ReadWrite", "Mail.Send" });
         AddDialog(new TeamsBotSsoPrompt(DialogConstants.TEAMS_SSO_PROMPT, settings));
 
         WaterfallDialog commandRouteDialog = new WaterfallDialog(

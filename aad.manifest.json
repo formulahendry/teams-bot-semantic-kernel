@@ -3,7 +3,7 @@
   "appId": "${{AAD_APP_CLIENT_ID}}",
   "name": "bot-sk",
   "accessTokenAcceptedVersion": 2,
-  "signInAudience": "AzureADMyOrg",
+  "signInAudience": "AzureADandPersonalMicrosoftAccount",
   "optionalClaims": {
     "idToken": [],
     "accessToken": [
@@ -22,6 +22,18 @@
       "resourceAccess": [
         {
           "id": "User.Read",
+          "type": "Scope"
+        },
+        {
+          "id": "Files.ReadWrite",
+          "type": "Scope"
+        },
+        {
+          "id": "Tasks.ReadWrite",
+          "type": "Scope"
+        },
+        {
+          "id": "Mail.Send",
           "type": "Scope"
         }
       ]
